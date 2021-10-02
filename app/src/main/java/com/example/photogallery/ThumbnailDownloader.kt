@@ -39,7 +39,7 @@ class ThumbnailDownloader<in T>(
     val viewLifecycleObserver: LifecycleObserver =
         object : LifecycleObserver {
             @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
-            fun clearQueue() {
+            fun tearDown() {
                 Log.i(TAG, "Clearing all requests from queue")
                 requestHandler.removeMessages(MESSAGE_DOWNLOAD)
                 requestMap.clear()
@@ -89,6 +89,11 @@ class ThumbnailDownloader<in T>(
         requestMap[target] = url
         requestHandler.obtainMessage(MESSAGE_DOWNLOAD, target)
             .sendToTarget()
+    }
+
+    fun clearQueue() {
+        requestHandler.removeMessages(MESSAGE_DOWNLOAD)
+        requestMap.clear()
     }
 
     private fun handleRequest(target: T) {

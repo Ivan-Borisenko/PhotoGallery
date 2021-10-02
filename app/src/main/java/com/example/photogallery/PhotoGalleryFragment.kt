@@ -5,12 +5,13 @@ import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.os.Handler
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.util.Log
+import android.view.*
 import android.widget.ImageView
+import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.GridLayoutManager
@@ -28,6 +29,7 @@ class PhotoGalleryFragment : Fragment() {
         super.onCreate(savedInstanceState)
 
         retainInstance = true
+        setHasOptionsMenu(true)
 
         //убрано в FlickrFetchr.kt
         /*val retrofit: Retrofit = Retrofit.Builder()
@@ -96,7 +98,7 @@ class PhotoGalleryFragment : Fragment() {
         photoGalleryViewModel.galleryItemLiveData.observe(
             viewLifecycleOwner,
             Observer { galleryItems ->
-                //Log.d(TAG, "Have gallery items from ViewModel $galleryItems")
+                Log.d(TAG, "Have gallery items from ViewModel $galleryItems")
                 //обновление данных, поддерживающих представление утилизатора
                 photoRecyclerView.adapter = PhotoAdapter(galleryItems)
             }
@@ -106,6 +108,7 @@ class PhotoGalleryFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
+        thumbnailDownloader.clearQueue()
         viewLifecycleOwner.lifecycle.removeObserver(
             thumbnailDownloader.viewLifecycleObserver
         )
@@ -116,6 +119,11 @@ class PhotoGalleryFragment : Fragment() {
         lifecycle.removeObserver(
             thumbnailDownloader.fragmentLifecycleObserver
         )
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
+        inflater.inflate(R.menu.fragment_photo_gallery, menu)
     }
 
     /*private class PhotoHolder(itemTextView: TextView)
@@ -153,7 +161,6 @@ class PhotoGalleryFragment : Fragment() {
                 R.drawable.bill_up_close
             ) ?: ColorDrawable()
             holder.bindDrawable(placeholder)
-
             thumbnailDownloader.queueThumbnail(holder, galleryItem.url)
         }
     }
