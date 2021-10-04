@@ -11,7 +11,6 @@ import com.example.photogallery.api.FlickrResponse
 import com.example.photogallery.api.PhotoInterceptor
 import com.example.photogallery.api.PhotoResponse
 import okhttp3.OkHttpClient
-import okhttp3.Request
 import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Callback

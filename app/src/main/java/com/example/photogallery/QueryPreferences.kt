@@ -2,11 +2,12 @@ package com.example.photogallery
 
 import android.content.Context
 import android.preference.PreferenceManager
+import androidx.core.content.edit
 
 private const val PREF_SEARCH_QUERY = "searchQuery"
 
 object QueryPreferences {
-//это синглтон
+//это синглтон, поэтому object, а не class
 
     fun getStoredQuery(context: Context): String {
         val prefs = PreferenceManager.getDefaultSharedPreferences(context)
@@ -15,8 +16,9 @@ object QueryPreferences {
 
     fun setStoredQuery(context: Context, query: String) {
         PreferenceManager.getDefaultSharedPreferences(context)
-            .edit()
-            .putString(PREF_SEARCH_QUERY, query)
-            .apply()
+            .edit {
+                putString(PREF_SEARCH_QUERY, query)
+                //.apply()
+            }
     }
 }
