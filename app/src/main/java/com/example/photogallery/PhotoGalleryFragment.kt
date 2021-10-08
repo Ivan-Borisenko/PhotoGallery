@@ -1,5 +1,6 @@
 package com.example.photogallery
 
+import android.content.Intent
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
@@ -187,9 +188,11 @@ class PhotoGalleryFragment : VisibleFragment() {
                         .Builder(PollWorker::class.java, 15, TimeUnit.MINUTES) //15 минут min
                         .setConstraints(constraints)
                         .build()
-                    WorkManager.getInstance().enqueueUniquePeriodicWork(POLL_WORK,
-                    ExistingPeriodicWorkPolicy.KEEP,
-                    periodicRequest)
+                    WorkManager.getInstance().enqueueUniquePeriodicWork(
+                        POLL_WORK,
+                        ExistingPeriodicWorkPolicy.KEEP,
+                        periodicRequest
+                    )
                     QueryPreferences.setPolling(requireContext(), true)
                 }
                 activity?.invalidateOptionsMenu()
@@ -201,14 +204,30 @@ class PhotoGalleryFragment : VisibleFragment() {
 
     /*private class PhotoHolder(itemTextView: TextView)
         : RecyclerView.ViewHolder(itemTextView) {*/
-    private class PhotoHolder(private val itemImageView: ImageView)
-        : RecyclerView.ViewHolder(itemImageView) {
-            //val bindTitle: (CharSequence) -> Unit = itemTextView::setText
-            val bindDrawable: (Drawable) -> Unit = itemImageView::setImageDrawable
+    private inner class PhotoHolder(private val itemImageView: ImageView) :
+        RecyclerView.ViewHolder(itemImageView), View.OnClickListener {
+
+        private lateinit var galleryItem: GalleryItem
+
+        init {
+            itemView.setOnClickListener(this)
+        }
+
+        //val bindTitle: (CharSequence) -> Unit = itemTextView::setText
+        val bindDrawable: (Drawable) -> Unit = itemImageView::setImageDrawable
+
+        fun bindGalleryItem(item: GalleryItem) {
+            galleryItem = item
+        }
+
+        override fun onClick(v: View?) {
+            val intent = Intent(Intent.ACTION_VIEW, galleryItem.photoPageUri)
+            startActivity(intent)
+        }
     }
 
-    private inner class PhotoAdapter(private val galleryItems: List<GalleryItem>)
-        : RecyclerView.Adapter<PhotoHolder>() {
+    private inner class PhotoAdapter(private val galleryItems: List<GalleryItem>) :
+        RecyclerView.Adapter<PhotoHolder>() {
 
         override fun onCreateViewHolder(
             parent: ViewGroup,
@@ -228,6 +247,7 @@ class PhotoGalleryFragment : VisibleFragment() {
 
         override fun onBindViewHolder(holder: PhotoHolder, position: Int) {
             val galleryItem = galleryItems[position]
+            holder.bindGalleryItem(galleryItem)
             //holder.bindTitle(galleryItem.title)
             val placeholder: Drawable = ContextCompat.getDrawable(
                 requireContext(),
